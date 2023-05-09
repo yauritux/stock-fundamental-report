@@ -1,0 +1,16 @@
+{
+  "timeZone": "America/Los_Angeles",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+
+  "dataStudio": {
+    "name": "StockFundamentalReport",
+    "logoUrl": "https://media.giphy.com/media/fwWN1z5x11VaLEqMdD/giphy.gif",
+    "company": "PT. Bisnisin Teknologi Asia",
+    "companyUrl": "https://bisnisin.asia",
+    "addonUrl": "https://github.com/yauritux/stock-fundamental-report",
+    "supportUrl": "https://github.com/yauritux/stock-fundamental-report/issues",
+    "description": "Fundamental Report for some top US companies",
+    "sources": ["yauritux"]
+  }
+}
