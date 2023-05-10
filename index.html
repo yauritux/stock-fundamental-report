@@ -2,11 +2,25 @@
 <html lang="en">
 <head>
   <title>Stock Market Fundamental Report</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'"/>
 </head>
 <body>
-   <a href="https://lookerstudio.google.com/u/0/reporting/create?c.reportId=7e4faca1-848b-42e5-ba74-822f48865063&ds.ds0.companySymbol=IT">IT Gartner</a>
-   <br/>
-   <a href="https://lookerstudio.google.com/u/0/reporting/create?c.reportId=7e4faca1-848b-42e5-ba74-822f48865063&ds.ds0.companySymbol=MSFT">Microsoft</a>
+   Company Code<br/>
+   <input type="text" name="companySymbol" id="companySymbol" placeholder="NFLX"/><br/>
+   Visitor Token<br/>
+   <input type="text" name="vot" id="vot" placeholder="QkXz6kOMxMq40s9"/><br/>
+   <button id="btnRefresh" name="btnRefresh" onClick="refreshData()">Refresh Data</button>
+   <br/><br/>
+   <iframe width="750" height="550" id="reportContainer" src="https://lookerstudio.google.com/embed/reporting/7e4faca1-848b-42e5-ba74-822f48865063/page/wykPD?params=%7B%22ds0.companySymbol%22%3A%22NFLX%22%2C%22ds0.vot%22%3A%22QkXz6kOMxMq40s9%22%7D" frameborder="0" style="border:0" allowfullscreen></iframe>
+   <script type="text/javascript">
+      function refreshData() {
+         var symbol = document.getElementById('companySymbol').value;
+         var token = document.getElementById('vot').value;
+         var params = {"ds0.companySymbol": symbol, "ds0.vot": token};
+         var paramsString = JSON.stringify(params);
+         var encodedParams = encodeURIComponent(paramsString);
+         var newContainerLink = `https://lookerstudio.google.com/embed/reporting/7e4faca1-848b-42e5-ba74-822f48865063/page/wykPD?params=${encodedParams}`;
+         document.getElementById('reportContainer').src = newContainerLink;
+      }
+   </script>
 </body>
 </html>
