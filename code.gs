@@ -17,24 +17,27 @@ function getConfig(request) {
 
   config.newInfo()
     .setId('instructions')
-    .setText('Enter the API-Key, Company Symbol on Stock Market, and the Report Type');
+    .setText('Enter the API-Key, Company Symbol on Stock Market, and your Visitor token');
 
   config.newTextInput()
     .setId('apiKey')
     .setName('Enter the API Key')
-    .setHelpText('e.g. Get your own API-key from alphavantage.co ');
+    .setHelpText('e.g. XHMV250S3VZSX1BE')
+    .setPlaceholder('XHMV250S3VZSX1BE');
 
   config.newTextInput()
     .setId('companySymbol')
     .setName('Enter the Company symbol as listed on the stock market')
     .setHelpText('e.g. IBM, MSFT, NFLX, IT')
-    .setPlaceholder('IBM');
+    .setPlaceholder('IBM')
+    .setAllowOverride(true);
 
   config.newTextInput()
-    .setId('reportType')
-    .setName('Enter type of report')
-    .setHelpText('e.g. annualReports, quarterlyReports')
-    .setPlaceholder('annualReports');
+    .setId('vot')
+    .setName('Enter your Visitor token')
+    .setHelpText('e.g. Yi1JEYCiD2as5xh')
+    .setPlaceholder('Yi1JEYCiD2as5xh')
+    .setAllowOverride(true);
 
   return config.build();
 }
@@ -44,6 +47,10 @@ function getFields(request) {
   var fields = cc.getFields();
   var types = cc.FieldType;
   var aggregations = cc.AggregationType;
+
+  fields.newDimension()
+    .setId('company')
+    .setType(types.TEXT);
   
   fields.newDimension()
     .setId('fiscalDateEnding')
@@ -181,12 +188,16 @@ function getSchema(request) {
   return { schema: fields };
 }
 
-function responseToRows(requestedFields, response) {  
+function responseToRows(requestedFields, response, company) {  
   // Transform parsed data and filter for requested fields
+  Logger.log("company type: " + (typeof company));
+  Logger.log("response type: " + (typeof response));
   return response.map(function(data) {
     var row = [];
     requestedFields.asArray().forEach(function (field) {
       switch (field.getId()) {
+        case 'company':
+          return row.push(company);
         case 'fiscalDateEnding':
           return row.push(data.fiscalDateEnding.replace(/-/g, ''));
         case 'reportedCurrency':
@@ -248,6 +259,21 @@ function responseToRows(requestedFields, response) {
 }
 
 function getData(request) {
+  var tokenEndpoint = 'http://13.213.8.29:9000/users/vot';
+  var tokenResponse = UrlFetchApp.fetch(tokenEndpoint);
+  var parsedTokenResponse = JSON.parse(tokenResponse);
+  var visitorToken = parsedTokenResponse.visitorToken;
+  Logger.log('your provided token ' + request.configParams.vot);
+  Logger.log('current valid token ' + visitorToken); 
+  if (request.configParams.vot != visitorToken) {
+    // reject request due to invalid visitor token
+    Logger.log('Failed to fetch data due to invalid visitor token!');
+    return {
+      schema: null,
+      rows: null
+    };
+  }
+
   var requestedFieldIds = request.fields.map(function(field) {
     return field.name;
   });
@@ -257,11 +283,13 @@ function getData(request) {
     request.configParams.companySymbol,
     '&apikey=',
     request.configParams.apiKey];
-  Logger.log('calling ' + url);
+  var endpoint = url.join('');
+  Logger.log('calling ' + endpoint);
   try {
-    var response = UrlFetchApp.fetch(url.join(''));
-    var parsedResponse = JSON.parse(response).annualReports;
-    var rows = responseToRows(requestedFields, parsedResponse);
+    var response = UrlFetchApp.fetch(endpoint);
+    var parsedResponse = JSON.parse(response);
+    Logger.log(parsedResponse);
+    var rows = responseToRows(requestedFields, parsedResponse.annualReports, request.configParams.companySymbol);
 
     Logger.log(rows);
 
