@@ -22,7 +22,7 @@ function getConfig(request) {
   config.newTextInput()
     .setId('apiKey')
     .setName('Enter the API Key')
-    .setHelpText('Get your own API key from alphavantage.co')
+    .setHelpText('Get your own API Key from alphavantage.co')
     .setPlaceholder('');
 
   config.newTextInput()
@@ -256,7 +256,7 @@ function responseToRows(requestedFields, response, company) {
 }
 
 function getData(request) {
-  var tokenEndpoint = 'http://13.213.8.29:9000/users/vot'; // This might not work, You have adjust the endpoint to your own token service endpoint
+  var tokenEndpoint = 'http://13.213.8.29:9000/users/vot'; // this might not work. Please create your own token generator service and replace this endpoint with that.
   var tokenResponse = UrlFetchApp.fetch(tokenEndpoint);
   var parsedTokenResponse = JSON.parse(tokenResponse);
   var visitorToken = parsedTokenResponse.visitorToken;
@@ -289,6 +289,14 @@ function getData(request) {
     var rows = responseToRows(requestedFields, parsedResponse.annualReports, request.configParams.companySymbol);
 
     Logger.log(rows);
+
+    // invalidate (renew) visitor token immediately after first usage
+    var options = {
+      "method": "POST"
+    };
+    var newTokenResponse = UrlFetchApp.fetch(tokenEndpoint, options);
+    var parsedNewToken = JSON.parse(newTokenResponse);
+    Logger.log('new token for the subsequent request: ' + parsedNewToken.visitorToken);
 
     return {
       schema: requestedFields.build(),
