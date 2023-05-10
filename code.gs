@@ -22,8 +22,8 @@ function getConfig(request) {
   config.newTextInput()
     .setId('apiKey')
     .setName('Enter the API Key')
-    .setHelpText('e.g. XHMV250S3VZSX1BE')
-    .setPlaceholder('XHMV250S3VZSX1BE');
+    .setHelpText('Get your own API key from alphavantage.co')
+    .setPlaceholder('');
 
   config.newTextInput()
     .setId('companySymbol')
@@ -36,7 +36,7 @@ function getConfig(request) {
     .setId('vot')
     .setName('Enter your Visitor token')
     .setHelpText('e.g. Yi1JEYCiD2as5xh')
-    .setPlaceholder('Yi1JEYCiD2as5xh')
+    .setPlaceholder('')
     .setAllowOverride(true);
 
   return config.build();
@@ -189,9 +189,6 @@ function getSchema(request) {
 }
 
 function responseToRows(requestedFields, response, company) {  
-  // Transform parsed data and filter for requested fields
-  Logger.log("company type: " + (typeof company));
-  Logger.log("response type: " + (typeof response));
   return response.map(function(data) {
     var row = [];
     requestedFields.asArray().forEach(function (field) {
@@ -259,7 +256,7 @@ function responseToRows(requestedFields, response, company) {
 }
 
 function getData(request) {
-  var tokenEndpoint = 'http://13.213.8.29:9000/users/vot';
+  var tokenEndpoint = 'http://13.213.8.29:9000/users/vot'; // This might not work, You have adjust the endpoint to your own token service endpoint
   var tokenResponse = UrlFetchApp.fetch(tokenEndpoint);
   var parsedTokenResponse = JSON.parse(tokenResponse);
   var visitorToken = parsedTokenResponse.visitorToken;
